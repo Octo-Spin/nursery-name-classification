@@ -1,0 +1,47 @@
+# Name: Bryan Maeen
+# Project: Classification - Nursery Database
+# Class: Machine Learning
+# Professor: Dr. Robert Nix
+# Semester: CMSC - 5333-01 Spring 2022
+
+import pandas as pd
+import xlsxwriter
+import numpy as np
+from sklearn.metrics import precision_score, recall_score
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.model_selection import train_test_split
+
+# Pulling the Training Data from the CSV file
+hhg = "C:\-nursery-train.data"
+df = pd.read_csv(hhg)
+pd.options.display.max_columns = 6
+
+# Converting String to Numbers and putting a ranking to that number Finance is a boolean value since there are only
+# two choices The rest I eyeballed and made a judgement.  It looks like the order given to us from nursery.names was
+# from lowest to highest except for health being in reverse order.
+df['convenient'] = df['finance'] == 'convenient'
+
+# Setting the X and Y values for the training and testing
+x = df[['parents', 'has_nurs', 'form', 'children', 'housing', 'finance,social', 'health']].values
+y = df['results'].values
+
+# The commands from sklearn for training and testing (learned from SoloLearn app)
+x_train, x_test, y_train, y_test = train_test_split(x, y, random_state=22)
+model = DecisionTreeClassifier()
+model.fit(x_train, y_train)
+print(model.predict(df))
+
+# Scoring the Decision Tree
+print("Accuracy: ", model.score(x_test, y_test))
+y_pred = model.predict(x_test)
+print("Precision: ", precision_score(y_test, y_pred))
+print("Recall: ", recall_score(y_test, y_pred))
+
+
+
+### DELETE BEFORE YOU TURN IN ###
+# writer = pd.ExcelWriter('D:\-Test.xlsx', engine='xlsxwriter')
+# df.describe().to_excel(writer, sheet_name='Sheet1')
+# writer.save()
+# print(df.head())
+# print(df.describe())
