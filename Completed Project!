@@ -1,0 +1,87 @@
+# Name: Bryan Maeen
+# Project: Classification - Nursery Database
+# Class: Machine Learning
+# Professor: Dr. Robert Nix
+# Semester: CMSC - 5333-01 Spring 2022
+# REFERENCES
+# https://datascience.stackexchange.com/questions/72343/encoding-with-ordinalencoder-how-to-give-levels-as-user-input
+# https://www.datacamp.com/community/tutorials/decision-tree-classification-python
+# https://scikit-learn.org/stable/modules/tree.html
+# https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.OrdinalEncoder.html
+# https://stackoverflow.com/questions/9319317/quick-and-easy-file-dialog-in-python
+# https://stackoverflow.com/questions/55488340/tkinter-filedialog-askopenfilename-settings
+# Advice and encouragement from David Burris
+
+import tkinter as tk
+from tkinter import filedialog
+
+import pandas as pd
+from sklearn import metrics
+from sklearn.preprocessing import OrdinalEncoder
+from sklearn.tree import DecisionTreeClassifier
+
+# Dialog Prompting Box
+training = tk.Tk()
+training.withdraw()
+hhgx = filedialog.askopenfilename(title="Please provide TRAINING data")
+
+test_lab = tk.Tk()
+test_lab.withdraw()
+hhgy = filedialog.askopenfilename(title="Please provide LABELED TEST data")
+
+test = tk.Tk()
+test.withdraw()
+hhgz = filedialog.askopenfilename(title="Please provide RAW data")
+
+# Pulling the Training Data from the CSV file
+dfx = pd.read_csv(hhgx)
+dfy = pd.read_csv(hhgy)
+dfz = pd.read_csv(hhgz)
+
+# Labeling Training and Testing Columns
+dfx.columns = ['parents', 'has_nurs', 'form', 'children', 'housing', 'finance', 'social', 'health', 'result']
+dfy.columns = ['parents', 'has_nurs', 'form', 'children', 'housing', 'finance', 'social', 'health', 'result']
+dfz.columns = ['parents', 'has_nurs', 'form', 'children', 'housing', 'finance', 'social', 'health']
+
+# Converting Training and Test String to Numbers
+enc = OrdinalEncoder()
+dfx = pd.DataFrame(enc.fit_transform(dfx))
+dfy = pd.DataFrame(enc.transform(dfy))
+dfx.columns = ['parents', 'has_nurs', 'form', 'children', 'housing', 'finance', 'social', 'health', 'result']
+dfy.columns = ['parents', 'has_nurs', 'form', 'children', 'housing', 'finance', 'social', 'health', 'result']
+
+# Converting Predicting Test String to Numbers
+encz = OrdinalEncoder()
+dfz = pd.DataFrame(encz.fit_transform(dfz))
+dfz.columns = ['parents', 'has_nurs', 'form', 'children', 'housing', 'finance', 'social', 'health']
+
+# Training
+train_values = dfx.drop('result', axis=1)
+train_results = dfx['result']
+
+tree = DecisionTreeClassifier()
+tree.fit(train_values, train_results)
+
+# Prediction with labeled Test
+test_values = dfy.drop('result', axis=1)
+test_results = dfy['result']
+
+test = tree.predict(test_values)
+
+# Accuracy with Labeled Test
+Acc = round(metrics.accuracy_score(test_results, test), 5)
+showoff1 = round(Acc * 1100)
+showoff2 = round(Acc * 1200)
+print("Accuracy: ", Acc, "\n")
+print('Acc_giving * 1100=', showoff1)
+print('Acc_secret * 1200=', showoff2, "\n")
+
+# Test without Labels
+test = tree.predict(dfz)
+dfz['8'] = test
+dfz = pd.DataFrame(enc.inverse_transform(dfz))
+dfz.columns = ['parents', 'has_nurs', 'form', 'children', 'housing', 'finance', 'social', 'health', 'result']
+
+# Test Data without Label Print Out
+for row in dfz.itertuples():
+    print(row)
